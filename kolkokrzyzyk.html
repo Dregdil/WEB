@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kółko i krzyżyk</title>
+    <script>
+        function gen() {
+            const fieldsElements = document.querySelectorAll(".board__item");
+            const panel = document.querySelector(".panel");
+            const button = document.querySelector(".reset");
+
+            let fields;
+            let activePlayer;
+            let gameActive;
+
+            const setDefaults = function() {
+                fields = ['', '', '', '', '', '', '', '', ''];
+                activePlayer = "O";
+                gameActive = true;
+            };
+
+            setDefaults();
+
+            const winningConditions = [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [6, 4, 2]
+            ];
+
+            const displayWinMessage = function() {
+                panel.innerText = `Koniec gry. Wygrywa ${activePlayer}, Gratulacje!`;
+            };
+
+            const displayTieMessage = function() {
+                panel.innerText = `Remis! Zagrajcie jeszcze raz`;
+            };
+
+            const clearMessage = function() {
+                panel.innerText = "";
+            };
+
+            const validateGame = function() {
+                let gameWon = false;
+                for (let i = 0; i <= 7; i++) {
+                    const [posA, posB, posC] = winningConditions[i];
+                    const value1 = fields[posA];
+                    const value2 = fields[posB];
+                    const value3 = fields[posC];
+
+                    if (value1 !== "" && value1 === value2 && value1 === value3) {
+                        gameWon = true;
+                        break;
+                    }
+                }
+                if (gameWon) {
+                    gameActive = false;
+                    displayWinMessage();
+                } else if (isBoardFull()) {
+                    gameActive = false;
+                    displayTieMessage();
+                }
+            };
+
+            const isBoardFull = function() {
+                return fields.find(field => field === '') === undefined;
+            };
+
+            fieldsElements.forEach(field => {
+                field.addEventListener("click", e => {
+                    const { pos } = e.target.dataset;
+
+                    if (gameActive && fields[pos] === "") {
+                        fields[pos] = activePlayer;
+                        e.target.innerText = activePlayer;
+                        validateGame();
+                        activePlayer = activePlayer === "X" ? "O" : "X";
+                    }
+                });
+            });
+
+            const resetBoardClasses = function() {
+                fieldsElements.forEach(field => {
+                    field.classList.remove('board__item--filled-X', 'board__item--filled-O');
+                    field.innerText = "";
+                });
+            };
+
+            const handleButtonClick = function() {
+                setDefaults();
+                resetBoardClasses();
+                clearMessage();
+            };
+
+            button.addEventListener('click', handleButtonClick);
+        }
+    </script>
+    <style>
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 10px;
+            grid-template-rows: repeat(3, 100px);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .board__item {
+            border-radius: 2px;
+            border: 2px solid grey;
+            transition: all 0.05s linear;
+        }
+
+        .board__item:hover {
+            background-color: rgb(182, 179, 179);
+        }
+    </style>
+</head>
+<body onload="gen()">
+    <p class="panel"></p>
+    <div class="board">
+        <div class="board__item" data-pos="0"></div>
+        <div class="board__item" data-pos="1"></div>
+        <div class="board__item" data-pos="2"></div>
+        <div class="board__item" data-pos="3"></div>
+        <div class="board__item" data-pos="4"></div>
+        <div class="board__item" data-pos="5"></div>
+        <div class="board__item" data-pos="6"></div>
+        <div class="board__item" data-pos="7"></div>
+        <div class="board__item" data-pos="8"></div>
+    </div>
+
+    <button class="reset">Reset gry</button>
+</body>
+</html>

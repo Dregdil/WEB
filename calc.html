@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculator</title>
+  <style>
+    #display {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      text-align: right;
+    }
+
+    #textBox {
+      text-align: left; /* Dodana właściwość dla lewego justowania tekstu */
+      width: 100%;
+      padding: 5px;
+    }
+  </style>
+  <script>
+    function gen() {
+      const main = document.getElementById("main");
+
+      const textBox = document.createElement("input");
+      textBox.type = "text";
+      textBox.id = "textBox";
+      main.appendChild(textBox);
+
+      let currentInput = "";
+
+      function numericKeyClick() {
+        currentInput += this.dataset.value;
+        updateDisplay();
+      }
+
+      function operatorKeyClick() {
+        currentInput += this.dataset.value;
+        updateDisplay();
+      }
+
+      function specialKeyClick() {
+        if (this.dataset.value === '=') {
+          evaluateExpression();
+        } else {
+          currentInput += this.dataset.value;
+          updateDisplay();
+        }
+      }
+
+      function clearKeyClick() {
+        if (this.dataset.value === 'CE') {
+          currentInput = "";
+        } else if (this.dataset.value === 'C') {
+          currentInput = currentInput.slice(0, -1);
+        }
+        updateDisplay();
+      }
+
+      function evaluateExpression() {
+        try {
+          const result = eval(currentInput);
+          currentInput = result.toString();
+          updateDisplay();
+        } catch (error) {
+          currentInput = "Błąd obliczenia";
+          updateDisplay();
+        }
+      }
+
+      function updateDisplay() {
+        textBox.value = currentInput;
+      }
+
+      for (let i = 0; i <= 9; i++) {
+        const key = document.createElement("button");
+        key.innerText = i;
+        key.onclick = numericKeyClick;
+        key.dataset.value = i;
+        main.appendChild(key);
+      }
+
+      const operators = ['+', '-', '*', '/'];
+      operators.forEach((operator) => {
+        const key = document.createElement("button");
+        key.innerText = operator;
+        key.onclick = operatorKeyClick;
+        key.dataset.value = operator;
+        main.appendChild(key);
+      });
+
+      const specialKeys = ['=', '.'];
+      specialKeys.forEach((specialKey) => {
+        const key = document.createElement("button");
+        key.innerText = specialKey;
+        key.onclick = specialKeyClick;
+        key.dataset.value = specialKey;
+        main.appendChild(key);
+      });
+
+      const clearKeys = ['C', 'CE'];
+      clearKeys.forEach((clearKey) => {
+        const key = document.createElement("button");
+        key.innerText = clearKey;
+        key.onclick = clearKeyClick;
+        key.dataset.value = clearKey;
+        main.appendChild(key);
+      });
+    }
+  </script>
+</head>
+
+<body onload="gen()">
+  <div id="main">
+  </div>
+</body>
+
+</html>
